@@ -1,0 +1,8 @@
+{
+  "name": "motirojs",
+  "version": "1.0.0",
+  "description": "A Fragmented JS Framework",
+  "main": "index.js",
+  "author": "Lucas Portela <developer@lucasportela.dev>",
+  "license": "MIT"
+}
