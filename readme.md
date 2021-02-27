@@ -2,7 +2,7 @@
 
 **License**: MIT
 
-**Author**: Lucas Santana do Nascimento Portela (<developer@lucaspotela.dev>)
+**Author**: Lucas Santana do Nascimento Portela (<developer@lucasportela.dev>)
 
 # MotiroJS Concept
 
