@@ -39,9 +39,10 @@ All fragments will be stored in a particular folder and will have this structure
   - **npm** `{package: version}`: An object simmilar to `package.json`'s dependencies, listing NPM dependencies.
 
 - `motiro.js`
+
   the fragment main code, exporting a default function with the parameters described in `motiro.json`
 
-- `<any other file/folder necessary especific to the module>`
+- `any other file/folder especific to the fragment`
 
 # Mesh
 
