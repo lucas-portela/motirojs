@@ -9,8 +9,12 @@
     "dev": "nodemon --inspect src/index.ts"
   },
   "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/node": "^14.14.37",
     "ts-node": "^8.0.3",
     "typescript": "^3.3.4000"
   },
-  "dependencies": {}
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
