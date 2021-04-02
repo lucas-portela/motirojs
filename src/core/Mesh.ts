@@ -9,8 +9,8 @@ import {
 export class Mesh {
   fragments: FragmentInstance<Fragment>[] = [];
 
-  constructor(params: { fragments: FragmentInstance<Fragment>[] }) {
-    this.add(params.fragments || []);
+  constructor(fragments?: FragmentInstance<Fragment>[]) {
+    this.add(fragments || []);
   }
 
   add(fragments: FragmentInstance<Fragment>[]) {
