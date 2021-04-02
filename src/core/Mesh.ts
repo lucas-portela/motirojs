@@ -10,7 +10,7 @@ export class Mesh {
   fragments: FragmentInstance<Fragment>[] = [];
 
   constructor(params: { fragments: FragmentInstance<Fragment>[] }) {
-    this.add(this.fragments);
+    this.add(params.fragments || []);
   }
 
   add(fragments: FragmentInstance<Fragment>[]) {
@@ -38,20 +38,22 @@ export class Mesh {
     );
   }
 
-  async get(params: { nick?: String; name?: String; message?: any }) {
+  async get(query: { nick?: String; name?: String; message?: any } | any) {
     let instance = this.fragments.find((instance) => {
       return (
-        (params.nick && instance.nick == params.nick) ||
-        (params.name && instance.fragment.name == params.name)
+        (query.nick && instance.nick == query.nick) ||
+        (query.name && instance.fragment.name == query.name) ||
+        (typeof query == "function" &&
+          instance.fragment.name == Fragment._generateName(query.name))
       );
     });
-    return await instance.eval(params.message || {});
+    return await instance.eval(query.message || {});
   }
 
   async run() {
     const events = this.events;
     for (let event of events) {
-      event.eval();
+      await event.eval();
     }
   }
 }

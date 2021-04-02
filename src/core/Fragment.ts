@@ -1,4 +1,5 @@
 import { Mesh } from "./Mesh";
+import kebabCase from "kebab-case";
 
 export type FragmentCodeContext = {
   message: any;
@@ -7,11 +8,18 @@ export type FragmentCodeContext = {
 };
 
 export class Fragment {
-  name: String = "unamed-fragment";
   dependencies: String[] = [];
   type: "resource" | "event" | "action" = "event";
   singleton: boolean = false;
   useInterventors: boolean = true;
+
+  get name() {
+    return Fragment._generateName(this.constructor.name);
+  }
+
+  static _generateName(originalName) {
+    return kebabCase(originalName).slice(1);
+  }
 
   code(parameters: Parameter[], context: FragmentCodeContext): Promise<any> {
     throw new Error("Method not implemented.");
@@ -32,7 +40,6 @@ export class ResourceFragment extends Fragment {
   constructor() {
     super();
     this.type = "resource";
-    this.name = "unamed-resource";
     this.useInterventors = true;
     this.singleton = true;
   }
@@ -42,7 +49,6 @@ export class EventFragment extends Fragment {
   constructor() {
     super();
     this.type = "event";
-    this.name = "unamed-event";
     this.useInterventors = true;
     this.singleton = true;
   }
@@ -52,7 +58,6 @@ export class ActionFragment extends Fragment {
   constructor() {
     super();
     this.type = "action";
-    this.name = "unamed-action";
     this.useInterventors = true;
     this.singleton = false;
   }
