@@ -8,15 +8,20 @@ import { ExpressRequest } from "./fragments/events/express-request";
 import { ExpressApp } from "./fragments/resources/express-app";
 
 mesh([
-  resource(ExpressApp),
+  // Application Resources
+  resource(ExpressApp, [parameter(ExpressApp.PORT, 8080)]),
+
+  // Events
   event(ExpressRequest, [
-    parameter(ExpressRequest.PATH, raw("/hello")).parameter(
-      ExpressRequest.METHOD,
-      ExpressRequest.method.all
-    ),
+    // Event parameters
+    parameter(ExpressRequest.PATH, "/hello"),
+    // Action dispatched when event occurs
     action(ExpressResponse, [
-      before([action(CheckAuth)]),
-      parameter(ExpressResponse.MESSAGE, raw("Welcome to MotiroJS!")),
+      before([
+        // Authentication Hook
+        action(CheckAuth),
+      ]),
+      parameter(ExpressResponse.MESSAGE, "Welcome to MotiroJS!"),
     ]),
   ]),
 ]).run();

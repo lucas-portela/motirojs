@@ -67,10 +67,11 @@ export class ParameterValues {
   }
 }
 
-export const parameter = (
-  paramSlot: ParameterSlot,
-  paramValue: ParameterValue
-) => new ParameterValues(paramSlot, paramValue);
+export const parameter = (paramSlot: ParameterSlot, paramValue: any) => {
+  // Cast raw JS values to ParameterValue
+  if (typeof paramValue.value != "function") paramValue = raw(paramValue);
+  return new ParameterValues(paramSlot, paramValue);
+};
 export const raw = (value: any) => new Raw(value);
 export const reference = (name: String) => new Reference(name);
 export const slot = (defaultValue: any = undefined) => {
