@@ -4,7 +4,7 @@ import {
   Fragment,
   FragmentInstance,
   ResourceFragment,
-} from "./Fragment";
+} from "./fragment";
 
 export class Mesh {
   fragments: FragmentInstance<Fragment>[] = [];
@@ -22,23 +22,23 @@ export class Mesh {
 
   get resources(): FragmentInstance<ResourceFragment>[] {
     return this.fragments.filter(
-      (instance) => instance.fragment.type == "resource"
+      (instance) => instance.fragment && instance.fragment.type == "resource"
     );
   }
 
   get events(): FragmentInstance<EventFragment>[] {
     return this.fragments.filter(
-      (instance) => instance.fragment.type == "event"
+      (instance) => instance.fragment && instance.fragment.type == "event"
     );
   }
 
   get actions(): FragmentInstance<ActionFragment>[] {
     return this.fragments.filter(
-      (instance) => instance.fragment.type == "action"
+      (instance) => instance.fragment && instance.fragment.type == "action"
     );
   }
 
-  async get(query: { nick?: String; name?: String; message?: any } | any) {
+  async get(query: { nick?: String; name?: String; shared?: any } | any) {
     let instance = this.fragments.find((instance) => {
       return (
         (query.nick && instance.nick == query.nick) ||
@@ -47,7 +47,7 @@ export class Mesh {
           instance.fragment.name == Fragment._generateName(query.name))
       );
     });
-    return await instance.eval(query.message || {});
+    return await instance.eval(query.shared || {});
   }
 
   async run() {
@@ -57,3 +57,6 @@ export class Mesh {
     }
   }
 }
+
+export const mesh = (fragments: FragmentInstance<Fragment>[]) =>
+  new Mesh(fragments);
