@@ -34,10 +34,23 @@ export class Reference extends ParameterValue {
   }
 }
 
-export class ParameterSlot {
+// export class ParameterSlot {
+//   defaultValue: ParameterValue;
+//   constructor(defaultValue?) {
+//     this.defaultValue = defaultValue;
+//   }
+// }
+
+export type ParameterSlot = ((value: ParameterValue | any) => void) & {
   defaultValue: ParameterValue;
-  constructor(defaultValue?) {
-    this.defaultValue = defaultValue;
+};
+export class SlotBinding {
+  paramValue: ParameterValue;
+  paramSlot: ParameterSlot;
+
+  constructor(paramSlot: ParameterSlot, paramValue?: ParameterValue) {
+    this.paramValue = paramValue;
+    this.paramSlot = paramSlot;
   }
 }
 
@@ -48,10 +61,10 @@ export class ParameterValues {
   >();
 
   constructor(paramSlot?: ParameterSlot, paramValue?: ParameterValue) {
-    if (paramSlot) this.parameter(paramSlot, paramValue);
+    if (paramSlot) this.add(paramSlot, paramValue);
   }
 
-  parameter(paramSlot: ParameterSlot, paramValue: ParameterValue) {
+  add(paramSlot: ParameterSlot, paramValue: ParameterValue) {
     this.values.set(paramSlot, paramValue);
     return this;
   }
@@ -67,15 +80,17 @@ export class ParameterValues {
   }
 }
 
-export const parameter = (paramSlot: ParameterSlot, paramValue: any) => {
-  // Cast raw JS values to ParameterValue
-  if (typeof paramValue.value != "function") paramValue = raw(paramValue);
-  return new ParameterValues(paramSlot, paramValue);
-};
 export const raw = (value: any) => new Raw(value);
 export const reference = (name: String) => new Reference(name);
 export const slot = (defaultValue: any = undefined) => {
   // Cast raw JS values to ParameterValue
   if (typeof defaultValue.value != "function") defaultValue = raw(defaultValue);
-  return new ParameterSlot(defaultValue);
+  var generator: any = (value: any) => {
+    if (value !== undefined && typeof value.value != "function")
+      value = raw(value);
+    return new SlotBinding(generator, value);
+  };
+  generator.defaultValue = defaultValue;
+
+  return generator as ParameterSlot;
 };

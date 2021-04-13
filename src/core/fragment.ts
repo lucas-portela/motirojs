@@ -146,7 +146,9 @@ export class After extends FragmentNamedParam<
 > {}
 
 export const namedFragmentParams = (params: any[] = []) => {
-  const named: FragmentInstanceParams<Fragment> = {};
+  const named: FragmentInstanceParams<Fragment> = {
+    parameters: new ParameterValues(),
+  };
   params.forEach((param) => {
     switch (param.constructor.name) {
       case "Nick":
@@ -163,6 +165,9 @@ export const namedFragmentParams = (params: any[] = []) => {
         break;
       case "ParameterValues":
         named.parameters = param;
+        break;
+      case "SlotBinding":
+        named.parameters.add(param.paramSlot, param.paramValue);
         break;
       default:
         if ((param.fragment || {}).type == "action") {
