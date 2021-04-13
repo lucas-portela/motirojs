@@ -211,17 +211,24 @@ const genericFragmentGenerator = <FragmentType extends Fragment>(
 
 export const resource = (
   fragmentConstructor: new () => ResourceFragment,
-  params?: FragmentGeneratorParams
+  params?: (Nick | ParameterValues | SlotBinding<any>)[]
 ) => genericFragmentGenerator<ResourceFragment>(fragmentConstructor, params);
 
 export const event = (
   fragmentConstructor: new () => EventFragment,
-  params?: FragmentGeneratorParams
+  params?: (FragmentInstance<any> | Nick | ParameterValues | SlotBinding<any>)[]
 ) => genericFragmentGenerator<EventFragment>(fragmentConstructor, params);
 
 export const action = (
   fragmentConstructor: new () => ActionFragment,
-  params?: FragmentGeneratorParams
+  params?: (
+    | Nick
+    | Groups
+    | Before
+    | After
+    | ParameterValues
+    | SlotBinding<any>
+  )[]
 ) => genericFragmentGenerator<ActionFragment>(fragmentConstructor, params);
 
 export const nick = (value: String) => new Nick(value);
