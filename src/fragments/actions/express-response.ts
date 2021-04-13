@@ -6,7 +6,7 @@ import {
 import { ParameterValues, slot } from "../../core/parameter";
 
 export class ExpressResponse extends ActionFragment {
-  static MESSAGE = slot("Express Response ;)");
+  static MESSAGE = slot<String>("Express Response ;)");
 
   async code(
     parameters: ParameterValues,

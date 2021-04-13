@@ -1,6 +1,6 @@
 import { Mesh } from "./mesh";
 import kebabCase from "kebab-case";
-import { ParameterValue, ParameterValues } from "./parameter";
+import { ParameterValue, ParameterValues, SlotBinding } from "./parameter";
 
 export type FragmentCodeContext = {
   shared: any;
@@ -29,12 +29,18 @@ export class Fragment {
     throw new Error("Method not implemented.");
   }
 
-  instantiate(params?: FragmentInstanceParams<this>): FragmentInstance<this> {
-    return new FragmentInstance({ ...(params || {}), fragment: this });
+  instantiate<FragmentType extends Fragment>(
+    params?: FragmentInstanceParams<this>
+  ): FragmentInstance<FragmentType> {
+    return new FragmentInstance<FragmentType>({
+      ...(params || {}),
+      fragment: this as any,
+    });
   }
 }
 
 export class ResourceFragment extends Fragment {
+  isResource = true;
   constructor() {
     super();
     this.type = "resource";
@@ -44,6 +50,7 @@ export class ResourceFragment extends Fragment {
 }
 
 export class EventFragment extends Fragment {
+  isEvent = true;
   constructor() {
     super();
     this.type = "event";
@@ -53,6 +60,7 @@ export class EventFragment extends Fragment {
 }
 
 export class ActionFragment extends Fragment {
+  isAction = true;
   constructor() {
     super();
     this.type = "action";
@@ -181,18 +189,43 @@ export const namedFragmentParams = (params: any[] = []) => {
 
 const fragmentCache: Map<any, Fragment> = new Map<any, Fragment>();
 
-const genericFragmentGenerator = (fragmentConstructor: any, params?: any[]) => {
+export type FragmentGeneratorParams = (
+  | FragmentInstance<any>
+  | Nick
+  | Groups
+  | Before
+  | After
+  | ParameterValues
+  | SlotBinding<any>
+)[];
+
+const genericFragmentGenerator = <FragmentType extends Fragment>(
+  fragmentConstructor: new () => FragmentType,
+  params?: FragmentGeneratorParams
+): FragmentInstance<FragmentType> => {
   const named = namedFragmentParams(params);
   const fragment =
     fragmentCache.get(fragmentConstructor) || new fragmentConstructor();
-  return fragment.instantiate(named);
+  return fragment.instantiate<FragmentType>(named);
 };
 
-export const resource = genericFragmentGenerator;
-export const event = genericFragmentGenerator;
-export const action = genericFragmentGenerator;
+export const resource = (
+  fragmentConstructor: new () => ResourceFragment,
+  params?: FragmentGeneratorParams
+) => genericFragmentGenerator<ResourceFragment>(fragmentConstructor, params);
+
+export const event = (
+  fragmentConstructor: new () => EventFragment,
+  params?: FragmentGeneratorParams
+) => genericFragmentGenerator<EventFragment>(fragmentConstructor, params);
+
+export const action = (
+  fragmentConstructor: new () => ActionFragment,
+  params?: FragmentGeneratorParams
+) => genericFragmentGenerator<ActionFragment>(fragmentConstructor, params);
+
 export const nick = (value: String) => new Nick(value);
-export const groups = (value: String[]) => new Groups(value);
+export const groups = (groupNames: String[]) => new Groups(groupNames);
 export const before = (value: FragmentInstance<ActionFragment>[]) =>
   new Before(value);
 export const after = (value: FragmentInstance<ActionFragment>[]) =>

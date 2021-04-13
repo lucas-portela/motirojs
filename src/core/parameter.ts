@@ -34,42 +34,41 @@ export class Reference extends ParameterValue {
   }
 }
 
-// export class ParameterSlot {
-//   defaultValue: ParameterValue;
-//   constructor(defaultValue?) {
-//     this.defaultValue = defaultValue;
-//   }
-// }
-
-export type ParameterSlot = ((value: ParameterValue | any) => void) & {
+export type ParameterSlot<ValueType> = ((
+  value: ParameterValue | ValueType
+) => SlotBinding<ValueType>) & {
   defaultValue: ParameterValue;
 };
-export class SlotBinding {
-  paramValue: ParameterValue;
-  paramSlot: ParameterSlot;
 
-  constructor(paramSlot: ParameterSlot, paramValue?: ParameterValue) {
+export class SlotBinding<ValueType> {
+  paramValue: ParameterValue;
+  paramSlot: ParameterSlot<ValueType>;
+
+  constructor(
+    paramSlot: ParameterSlot<ValueType>,
+    paramValue?: ParameterValue
+  ) {
     this.paramValue = paramValue;
     this.paramSlot = paramSlot;
   }
 }
 
 export class ParameterValues {
-  values: Map<ParameterSlot, ParameterValue> = new Map<
-    ParameterSlot,
+  values: Map<ParameterSlot<any>, ParameterValue> = new Map<
+    ParameterSlot<any>,
     ParameterValue
   >();
 
-  constructor(paramSlot?: ParameterSlot, paramValue?: ParameterValue) {
+  constructor(paramSlot?: ParameterSlot<any>, paramValue?: ParameterValue) {
     if (paramSlot) this.add(paramSlot, paramValue);
   }
 
-  add(paramSlot: ParameterSlot, paramValue: ParameterValue) {
+  add(paramSlot: ParameterSlot<any>, paramValue: ParameterValue) {
     this.values.set(paramSlot, paramValue);
     return this;
   }
 
-  get(paramSlot: ParameterSlot) {
+  get(paramSlot: ParameterSlot<any>) {
     let paramValue = this.values.get(paramSlot);
     let value = paramValue ? paramValue.value() : undefined;
     if (value === undefined)
@@ -82,15 +81,21 @@ export class ParameterValues {
 
 export const raw = (value: any) => new Raw(value);
 export const reference = (name: String) => new Reference(name);
-export const slot = (defaultValue: any = undefined) => {
+export const slot = <ValueType>(
+  defaultValue: ValueType | ParameterValue = undefined
+) => {
   // Cast raw JS values to ParameterValue
-  if (typeof defaultValue.value != "function") defaultValue = raw(defaultValue);
-  var generator: any = (value: any) => {
-    if (value !== undefined && typeof value.value != "function")
+  if (typeof (defaultValue as ParameterValue).value != "function")
+    defaultValue = raw(defaultValue);
+  var generator: any = (value: ValueType | ParameterValue) => {
+    if (
+      value !== undefined &&
+      typeof (value as ParameterValue).value != "function"
+    )
       value = raw(value);
-    return new SlotBinding(generator, value);
+    return new SlotBinding(generator, value as ParameterValue);
   };
   generator.defaultValue = defaultValue;
 
-  return generator as ParameterSlot;
+  return generator as ParameterSlot<ValueType>;
 };

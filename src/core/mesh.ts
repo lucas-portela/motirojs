@@ -23,19 +23,19 @@ export class Mesh {
   get resources(): FragmentInstance<ResourceFragment>[] {
     return this.fragments.filter(
       (instance) => instance.fragment && instance.fragment.type == "resource"
-    );
+    ) as FragmentInstance<ResourceFragment>[];
   }
 
   get events(): FragmentInstance<EventFragment>[] {
     return this.fragments.filter(
       (instance) => instance.fragment && instance.fragment.type == "event"
-    );
+    ) as FragmentInstance<EventFragment>[];
   }
 
   get actions(): FragmentInstance<ActionFragment>[] {
     return this.fragments.filter(
       (instance) => instance.fragment && instance.fragment.type == "action"
-    );
+    ) as FragmentInstance<ActionFragment>[];
   }
 
   async get(query: { nick?: String; name?: String; shared?: any } | any) {
